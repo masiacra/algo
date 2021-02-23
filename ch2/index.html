@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>favorite colors</title>
+	<style>
+		#panel {
+			width: 50px;
+			height: 50px;
+			background-color: lightgreen;
+			position: absolute;
+		}
+	</style>
+	<script src="https://unpkg.com/@reactivex/rxjs@5.0.0-beta.1/dist/global/Rx.umd.js">
+	</script>
+</head>
+<body>
+<div id="panel">
+</div>
+	<script>
+
+const panel = document.getElementById('panel');
+const mouseDown$ = Rx.Observable.fromEvent(panel, 'mousedown');
+const mouseUp$ = Rx.Observable.fromEvent(document, 'mouseup');
+const mouseMove$ = Rx.Observable.fromEvent(document, 'mousemove');
+
+const drag$ = mouseDown$.concatMap(() => mouseMove$.takeUntil(mouseUp$));
+
+drag$.subscribe(event => {
+	panel.style.left = event.clientX + 'px';
+	panel.style.top = event.clientY + 'px';
+});
+
+const interval$ = Rx.Observable.interval(1000);
+const clicks$ = Rx.Observable.fromEvent(document, 'click');
+
+interval$.takeUntil(clicks$)
+	.subscribe(
+		x => console.log(x),
+		console.log,
+		() => console.log('OK, user clicked!')
+	);
+
+	</script>
+	
+
+</body>
+</html>
